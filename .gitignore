@@ -109,9 +109,7 @@ ipython_config.py
 .env.development.local
 .env.test.local
 .env.production.local
-
-# Keep example files
-!.env.example
+.env.example
 
 # Configuration overrides
 config.local.json
