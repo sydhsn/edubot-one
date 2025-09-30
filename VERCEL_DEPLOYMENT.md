@@ -36,14 +36,29 @@ Vercel will automatically use these settings from `apps/web/vercel.json`:
 
 ### 3. 🔧 **Improved File Organization**
 
-#### ✅ `apps/web/vercel.json` (New Location)
-Now properly located in the web app directory:
+## 🚀 Vercel Deployment Guide
+
+## 📋 **Quick Deploy Steps**
+1. **Import Repository** from GitHub
+2. **Keep Root Directory** as default (repository root) ← **Changed!**
+3. **Deploy** - Vercel will use vercel.json automatically
+4. **Update API URL** after deployment
+
+## ⚙️ **Configuration Details**
+
+### **vercel.json** (Repository Root)
 ```json
 {
-  "buildCommand": "npm install --prefix ../.. && npx nx build web --prod",
-  "outputDirectory": "dist"
+  "buildCommand": "npm install && npx nx build web",
+  "outputDirectory": "apps/web/dist"
 }
 ```
+
+### **Build Process**
+- ✅ Installs dependencies from monorepo root
+- ✅ Uses Nx to build the web application
+- ✅ Outputs to correct directory: `apps/web/dist`
+- ✅ Proper monorepo structure support
 
 #### ✅ `apps/web/package.json`
 Includes proper build scripts:
