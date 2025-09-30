@@ -1,0 +1,66 @@
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    container_name: edubot-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+      - ENV=production
+    env_file:
+      - ./apps/api/.env
+    volumes:
+      - ./apps/api/src:/app/src:ro
+    restart: unless-stopped
+    networks:
+      - edubot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+    container_name: edubot-web
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - edubot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: MongoDB for data persistence
+  mongodb:
+    image: mongo:7
+    container_name: edubot-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: edubot
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    restart: unless-stopped
+    networks:
+      - edubot-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  edubot-network:
+    driver: bridge
