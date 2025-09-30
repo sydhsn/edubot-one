@@ -1,60 +1,289 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# ===================
+# EduBot One - Comprehensive .gitignore
+# ===================
 
-# compiled output
-dist
-tmp
-out-tsc
+# ===================
+# Node.js / JavaScript / TypeScript
+# ===================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
 
-# dependencies
-node_modules
+# Build outputs
+dist/
+build/
+out/
+tmp/
+out-tsc/
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
 
-# IDE - VSCode
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Vite
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
+
+# TypeScript
+*.tsbuildinfo
+
+# ===================
+# Python / FastAPI
+# ===================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.pyenv
+pyvenv.cfg
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# ===================
+# Environment & Configuration
+# ===================
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep example files
+!.env.example
+
+# Configuration overrides
+config.local.json
+*.local.json
+
+# ===================
+# Database
+# ===================
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# MongoDB dumps
+dump/
+
+# ===================
+# Docker
+# ===================
+# Docker override files
+docker-compose.override.yml
+
+# ===================
+# IDEs and Editors
+# ===================
+# VSCode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+*.code-workspace
 
-# misc
+# IntelliJ / WebStorm / PyCharm
+.idea/
+*.swp
+*.swo
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*~
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Atom
+.ftpconfig
+.sftpconfig
+
+# ===================
+# System Files
+# ===================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+
+# ===================
+# Logs
+# ===================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime logs
+*.out
+
+# ===================
+# Nx Monorepo
+# ===================
+.nx/cache
+.nx/workspace-data
+
+# Nx project graph cache
+.nx/project-graph
+
+# ===================
+# Testing
+# ===================
+# Jest
+coverage/
+.nyc_output
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+
+# ===================
+# Deployment
+# ===================
+# Vercel
+.vercel
+
+# Netlify
+.netlify
+
+# ===================
+# Temporary & Cache
+# ===================
+# Temporary folders
+tmp/
+temp/
+
+# Cache folders
+.cache/
+.parcel-cache/
+
+# Misc
 /.sass-cache
 /connect.lock
-/coverage
 /libpeerconnection.log
-npm-debug.log
-yarn-error.log
 testem.log
 /typings
 
-# System Files
-.DS_Store
-Thumbs.db
+# ===================
+# Generated Files
+# ===================
+# Generated documentation
+docs/generated/
 
-.nx/cache
-.nx/workspace-data
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
+# Auto-generated files
+generated/
 
-vite.config.*.timestamp*
-vitest.config.*.timestamp*
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-.env
-.idea/
-.vscode/
-*.log
-.DS_Store
+# Build artifacts
+*.tar.gz
+*.zip
+
+# ===================
+# Security
+# ===================
+# Private keys
+*.pem
+*.key
+!public.key
+
+# Certificates
+*.crt
+*.cert
+
+# ===================
+# Backup Files
+# ===================
+*.bak
+*.backup
+*.old
+*.orig
