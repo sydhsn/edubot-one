@@ -1,6 +1,23 @@
 # 🚀 Render Deployment Guide for EduBot API
 
-## Quick Deployment Steps
+## ⚠️ **IMPORTANT: Choose Deployment Method**
+
+Render offers two deployment methods. Choose **Option A (Recommended)** for simplicity:
+
+### **Option A: Native Python Environment (Recommended)**
+- ✅ Faster builds
+- ✅ Easier debugging  
+- ✅ Better for Python apps
+- ✅ Uses `requirements.txt` directly
+
+### **Option B: Docker Environment**
+- 🐳 Uses Dockerfile
+- 📦 More isolated
+- 🛠️ More complex setup
+
+---
+
+## 🚀 **Option A: Native Python Deployment (Recommended)**
 
 ### 1. 📁 **Connect Repository to Render**
 
@@ -12,17 +29,40 @@
 
 ### 2. ⚙️ **Configure Service Settings**
 
+**IMPORTANT: Select Native Environment (NOT Docker)**
+
 **Basic Configuration:**
 - **Name**: `edubot-api`
 - **Branch**: `main`
-- **Runtime**: `Python 3`
-- **Build Command**: `./apps/api/build.sh`
-- **Start Command**: `./apps/api/start.sh`
+- **Runtime**: `Python 3` ⚠️ **NOT Docker**
+- **Region**: Choose closest to your users
+- **Build Command**: `cd apps/api && pip install -r requirements.txt`
+- **Start Command**: `cd apps/api && uvicorn src.main:app --host 0.0.0.0 --port $PORT`
 - **Instance Type**: `Free` (or paid for production)
 
 **Advanced Settings:**
 - **Root Directory**: Leave empty (Render will use repository root)
 - **Auto-Deploy**: `Yes` (deploys on every push to main)
+- **Python Version**: `3.11.9` (will be read from runtime.txt)
+
+---
+
+## 🐳 **Option B: Docker Deployment (Alternative)**
+
+If you prefer Docker deployment:
+
+**Basic Configuration:**
+- **Name**: `edubot-api`
+- **Branch**: `main`  
+- **Runtime**: `Docker` 
+- **Dockerfile Path**: `Dockerfile` (in root directory)
+- **Instance Type**: `Free` (or paid for production)
+
+**Advanced Settings:**
+- **Root Directory**: Leave empty
+- **Auto-Deploy**: `Yes`
+
+---
 
 ### 3. 🔐 **Environment Variables**
 
@@ -88,15 +128,25 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
 
 ## 🔧 **Troubleshooting**
 
+### **"No Dockerfile found" Error**
+✅ **Solution**: Choose **"Python 3"** runtime, NOT "Docker"
+- In Render dashboard, make sure Runtime is set to "Python 3"
+- If you accidentally selected Docker, delete the service and recreate with Python 3
+
 ### **Build Fails**
 - Check the build logs in Render dashboard
 - Verify `requirements.txt` has all dependencies
-- Ensure Python version in `runtime.txt` is supported
+- Ensure Python version in `runtime.txt` is supported (3.11.9)
 
 ### **App Crashes on Start**
-- Check start command: `./apps/api/start.sh`
-- Verify environment variables are set
-- Check application logs for errors
+- Check start command: `cd apps/api && uvicorn src.main:app --host 0.0.0.0 --port $PORT`
+- Verify environment variables are set correctly
+- Check application logs for import errors
+
+### **Import Errors**
+- Ensure the start command includes `cd apps/api`
+- Check that all required files are in the `apps/api` directory
+- Verify PYTHONPATH is set correctly
 
 ### **Database Connection Issues**
 - Verify `DATABASE_URL` is correct
