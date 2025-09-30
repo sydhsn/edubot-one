@@ -7,6 +7,7 @@ The following issues have been fixed:
 - ✅ Incorrect vercel.json configuration
 - ✅ Wrong output directory for Nx monorepo
 - ✅ Build command errors
+- ✅ Moved vercel.json to apps/web for better organization
 
 ## 🚀 **Quick Deploy Steps (Now Working)**
 
@@ -16,26 +17,36 @@ The following issues have been fixed:
 2. Sign up/Login with your GitHub account
 3. Click **"Add New"** → **"Project"**
 4. Import your `edubot-one` repository
-5. Click **"Import"**
+5. **IMPORTANT**: Set **Root Directory** to `apps/web`
+6. Click **"Deploy"**
 
 ### 2. ⚙️ **Project Settings (Auto-configured)**
 
-Vercel will automatically use these settings from our fixed `vercel.json`:
+Vercel will automatically use these settings from `apps/web/vercel.json`:
 
 ```json
 {
-  "buildCommand": "npm install && npx nx build web --prod",
-  "outputDirectory": "dist/apps/web",
-  "installCommand": "npm install"
+  "buildCommand": "npm install --prefix ../.. && npx nx build web --prod",
+  "outputDirectory": "dist",
+  "installCommand": "npm install --prefix ../.."
 }
 ```
 
-**DO NOT OVERRIDE** - Let Vercel use the vercel.json configuration.
+**Root Directory**: `apps/web` ← **Set this in Vercel dashboard**
 
-### 3. 🔧 **Fixed Configuration Files**
+### 3. 🔧 **Improved File Organization**
 
-#### ✅ Updated `apps/web/package.json`
-Now includes proper build scripts:
+#### ✅ `apps/web/vercel.json` (New Location)
+Now properly located in the web app directory:
+```json
+{
+  "buildCommand": "npm install --prefix ../.. && npx nx build web --prod",
+  "outputDirectory": "dist"
+}
+```
+
+#### ✅ `apps/web/package.json`
+Includes proper build scripts:
 ```json
 {
   "scripts": {
@@ -43,15 +54,6 @@ Now includes proper build scripts:
     "dev": "vite dev",
     "preview": "vite preview"
   }
-}
-```
-
-#### ✅ Updated `vercel.json`
-Now works with Nx monorepo:
-```json
-{
-  "buildCommand": "npm install && npx nx build web --prod",
-  "outputDirectory": "dist/apps/web"
 }
 ```
 Create `apps/web/src/config/api.ts`:

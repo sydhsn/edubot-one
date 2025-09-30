@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npx nx build web --prod",
-  "outputDirectory": "apps/web/dist",
-  "installCommand": "npm install",
+  "buildCommand": "npm install --prefix ../.. && npx nx build web --prod",
+  "outputDirectory": "dist",
+  "installCommand": "npm install --prefix ../..",
   "framework": null,
   "rewrites": [
     {
