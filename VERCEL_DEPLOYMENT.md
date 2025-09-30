@@ -1,33 +1,59 @@
-# Vercel Deployment Guide for React Frontend
+# ✅ FIXED: Vercel Deployment Guide for EduBot Web App
 
-## Quick Deploy Button
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/edubot-one)
+## ⚠️ **Deployment Issues Resolved**
 
-## Prerequisites
-- GitHub repository with your code
-- Vercel account (free tier available)
-- API deployed on Render (or your preferred service)
+The following issues have been fixed:
+- ✅ Missing build scripts in package.json
+- ✅ Incorrect vercel.json configuration
+- ✅ Wrong output directory for Nx monorepo
+- ✅ Build command errors
 
-## Project Configuration
+## 🚀 **Quick Deploy Steps (Now Working)**
 
-### 1. Update Package.json
-Ensure your `apps/web/package.json` has the correct build script:
+### 1. 📁 **Connect Repository to Vercel**
+
+1. Go to [https://vercel.com](https://vercel.com)
+2. Sign up/Login with your GitHub account
+3. Click **"Add New"** → **"Project"**
+4. Import your `edubot-one` repository
+5. Click **"Import"**
+
+### 2. ⚙️ **Project Settings (Auto-configured)**
+
+Vercel will automatically use these settings from our fixed `vercel.json`:
 
 ```json
 {
-  "name": "@edubot-one/web",
+  "buildCommand": "npm install && npx nx build web --prod",
+  "outputDirectory": "dist/apps/web",
+  "installCommand": "npm install"
+}
+```
+
+**DO NOT OVERRIDE** - Let Vercel use the vercel.json configuration.
+
+### 3. 🔧 **Fixed Configuration Files**
+
+#### ✅ Updated `apps/web/package.json`
+Now includes proper build scripts:
+```json
+{
   "scripts": {
     "build": "vite build",
-    "preview": "vite preview",
-    "vercel-build": "npm run build"
-  },
-  "dependencies": {
-    // your dependencies
+    "dev": "vite dev",
+    "preview": "vite preview"
   }
 }
 ```
 
-### 2. Create API Configuration
+#### ✅ Updated `vercel.json`
+Now works with Nx monorepo:
+```json
+{
+  "buildCommand": "npm install && npx nx build web --prod",
+  "outputDirectory": "dist/apps/web"
+}
+```
 Create `apps/web/src/config/api.ts`:
 
 ```typescript

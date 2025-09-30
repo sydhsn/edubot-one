@@ -1,27 +1,16 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "apps/web/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "https://your-api-service.onrender.com/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/apps/web/dist/$1"
-    }
-  ],
+  "buildCommand": "npm install && npx nx build web --prod",
+  "outputDirectory": "dist/apps/web",
+  "installCommand": "npm install",
+  "framework": null,
   "rewrites": [
     {
-      "source": "/((?!api/).*)",
+      "source": "/api/(.*)",
+      "destination": "https://your-api-service.onrender.com/api/v1/$1"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
@@ -36,8 +25,15 @@
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
         }
       ]
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
