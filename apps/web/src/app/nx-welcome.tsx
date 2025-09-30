@@ -5,7 +5,30 @@
  Delete this file and get started with your project!
  * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
+import { useEffect, useState } from 'react';
 export function NxWelcome({ title }: { title: string }) {
+const [status, setStatus] = useState('');
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/health');
+        if (res.ok) {
+          const data = await res.json();
+          console.log(data);
+          setStatus(data.status);
+        } else {
+          setStatus('Error fetching data');
+        }
+      } catch (error) {
+        setStatus('Error fetching data');
+        console.error(error);
+      }
+    };
+
+    fetchStatus();
+  }, []);
+
   return (
     <>
       <style
@@ -431,9 +454,12 @@ export function NxWelcome({ title }: { title: string }) {
         <div className="container">
           <div id="welcome">
             <h1>
+            
               <span> Hello there, </span>
               Welcome {title} 👋
             </h1>
+            {status && <p>{status}</p>}
+
           </div>
 
           <div id="hero" className="rounded">
