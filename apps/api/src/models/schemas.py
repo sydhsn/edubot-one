@@ -1,31 +1,75 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional, List
+"""
+Simple school management system models
+"""
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional
 from datetime import datetime
 from enum import Enum
 
 class UserRole(str, Enum):
     ADMIN = "admin"
     TEACHER = "teacher"
-    PARENT = "parent"
     STUDENT = "student"
 
+# Base User Models
 class UserBase(BaseModel):
     email: EmailStr
     full_name: str
+    mobile: str
     role: UserRole
-    school_id: str
 
-class UserCreate(UserBase):
+# Student Models
+class StudentCreate(BaseModel):
+    email: EmailStr
+    full_name: str
+    mobile: str
     password: str
-
-class User(UserBase):
+    class_name: str  # e.g., "10th Grade", "12th Science"
+    address: Optional[str] = None
+    
+class Student(BaseModel):
     id: str
+    email: EmailStr
+    full_name: str
+    mobile: str
+    class_name: str
+    address: Optional[str] = None
+    role: UserRole = UserRole.STUDENT
+    admission_number: Optional[str] = None
     created_at: datetime
     is_active: bool = True
-    
-    class Config:
-        from_attributes = True
 
+# Teacher Models
+class TeacherCreate(BaseModel):
+    email: EmailStr
+    full_name: str
+    mobile: str
+    password: str
+    subject: str  # e.g., "Mathematics", "Physics"
+    
+class Teacher(BaseModel):
+    id: str
+    email: EmailStr
+    full_name: str
+    mobile: str
+    subject: str
+    role: UserRole = UserRole.TEACHER
+    employee_id: Optional[str] = None
+    created_at: datetime
+    is_active: bool = True
+
+# Admin Models
+class Admin(BaseModel):
+    id: str
+    email: EmailStr
+    full_name: str
+    mobile: str
+    role: UserRole = UserRole.ADMIN
+    employee_id: Optional[str] = None
+    created_at: datetime
+    is_active: bool = True
+
+# Authentication Models
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
@@ -33,39 +77,19 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
-    user: User
+    user_role: UserRole
+    user_info: dict
 
-class AttendanceStatus(str, Enum):
-    PRESENT = "present"
-    ABSENT = "absent"
-    LATE = "late"
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
 
-class AttendanceRecord(BaseModel):
-    student_id: str
-    date: str  # YYYY-MM-DD
-    status: AttendanceStatus
-    recorded_by: str
-    notes: Optional[str] = None
+class ResetPasswordRequest(BaseModel):
+    reset_token: str
+    new_password: str
 
-class AdmissionApplication(BaseModel):
-    student_name: str
-    grade: str
-    parent_email: EmailStr
-    parent_phone: str
-
-class AIQuestionRequest(BaseModel):
-    subject: str
-    topic: str
-    difficulty: str = "medium"
-    number_of_questions: int = 10
-
-class AIQuestionResponse(BaseModel):
-    questions: List[str]
-    answers: List[str]
-
-class ReportCard(BaseModel):
-    student_id: str
-    term: str
-    grades: dict
-    attendance: dict
-    teacher_comments: str
+# Dashboard Models
+class DashboardResponse(BaseModel):
+    message: str
+    user_role: str
+    user_info: dict
+    stats: Optional[dict] = None
