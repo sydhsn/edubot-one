@@ -25,7 +25,7 @@ class Settings(BaseSettings):
         return self.algorithm
     
     # CORS
-    allowed_origins: str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001")
+    allowed_origins: str = os.getenv("ALLOWED_ORIGINS", "*")
     
     class Config:
         env_file = ".env"

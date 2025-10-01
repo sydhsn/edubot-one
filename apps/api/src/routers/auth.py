@@ -137,3 +137,17 @@ async def get_profile(current_user: dict = Depends(get_current_user)):
         "full_name": current_user["full_name"],
         "role": current_user["role"]
     }
+
+@router.post("/setup-defaults")
+async def setup_default_users():
+    """Setup default admin, teacher, and student users (for development/testing)"""
+    try:
+        result = await auth_service.setup_default_users()
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Setup failed: {str(e)}"
+        )

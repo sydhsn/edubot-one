@@ -1,33 +1,26 @@
-import { useState } from 'react';
-import { Header, Footer, Login } from '../components';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from '../contexts/AuthContext';
 
-export function App() {
-  const [showLogin, setShowLogin] = useState(false);
+// Public components
+import { Header, Footer } from '../components';
 
-  const handleLogin = (role: 'student' | 'teacher' | 'admin', credentials: { username: string; password: string }) => {
-    console.log('Login attempt:', { role, credentials });
-    // Here you would typically make an API call to authenticate
-    alert(`Welcome ${role}! Username: ${credentials.username}`);
-    setShowLogin(false);
-  };
+// Authentication components
+import Login from '../components/Login';
+import ForgotPassword from '../components/ForgotPassword';
+import Unauthorized from '../components/Unauthorized';
 
+// Dashboard components
+import AdminDashboard from '../components/AdminDashboard';
+import TeacherDashboard from '../components/TeacherDashboard';
+import StudentDashboard from '../components/StudentDashboard';
+
+// Protected Route components
+import { AdminRoute, TeacherRoute, StudentRoute, PublicRoute } from '../components/ProtectedRoute';
+
+// Home page component
+function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
-      {/* Header Component */}
-      <Header 
-        schoolName="EduBot AI School"
-        showLoginButton={true}
-        onLoginClick={() => setShowLogin(true)}
-      />
-
-      {/* Login Modal */}
-      {showLogin && (
-        <Login 
-          onClose={() => setShowLogin(false)}
-          onLogin={handleLogin}
-        />
-      )}
-
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
@@ -50,48 +43,50 @@ export function App() {
             <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto lg:mx-0 leading-relaxed">
               Experience the future of education with our AI-powered school management system. 
               Complete digital transformation for Classes 4-10 with personalized learning and smart automation.
-            </p>              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-16">
-                <button className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold text-lg rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all transform hover:scale-105 shadow-lg">
-                  Admissions Open
-                </button>
-                <button className="px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold text-lg rounded-xl hover:border-emerald-500 hover:text-emerald-600 transition-all flex items-center justify-center space-x-2">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                  <span>Virtual Tour</span>
-                </button>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto lg:mx-0">
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm">
-                  <div className="text-3xl font-bold text-emerald-600 mb-2">1200+</div>
-                  <div className="text-gray-600">Happy Students</div>
-                </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm">
-                  <div className="text-3xl font-bold text-teal-600 mb-2">98%</div>
-                  <div className="text-gray-600">Success Rate</div>
-                </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm">
-                  <div className="text-3xl font-bold text-amber-600 mb-2">AI-Powered</div>
-                  <div className="text-gray-600">Learning Experience</div>
-                </div>
-              </div>
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-16">
+              <button className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold text-lg rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all transform hover:scale-105 shadow-lg">
+                Admissions Open
+              </button>
+              <button className="px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold text-lg rounded-xl hover:border-emerald-500 hover:text-emerald-600 transition-all flex items-center justify-center space-x-2">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+                <span>Virtual Tour</span>
+              </button>
             </div>
 
-            {/* Right Column - Hero Image */}
-            <div className="relative">
-              <div className="relative z-10">
-                <img 
-                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" 
-                  alt="Students learning with AI technology" 
-                  className="rounded-2xl shadow-2xl"
-                />
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto lg:mx-0">
+              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm">
+                <div className="text-3xl font-bold text-emerald-600 mb-2">1200+</div>
+                <div className="text-gray-600">Happy Students</div>
               </div>
-              {/* Background decoration */}
-              <div className="absolute -top-4 -right-4 w-full h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-2xl opacity-20"></div>
-              <div className="absolute -bottom-4 -left-4 w-full h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-2xl opacity-20"></div>
+              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm">
+                <div className="text-3xl font-bold text-teal-600 mb-2">98%</div>
+                <div className="text-gray-600">Success Rate</div>
+              </div>
+              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm">
+                <div className="text-3xl font-bold text-amber-600 mb-2">AI-Powered</div>
+                <div className="text-gray-600">Learning Experience</div>
+              </div>
             </div>
+          </div>
+
+          {/* Right Column - Hero Image */}
+          <div className="relative">
+            <div className="relative z-10">
+              <img 
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" 
+                alt="Students learning with AI technology" 
+                className="rounded-2xl shadow-2xl"
+              />
+            </div>
+            {/* Background decoration */}
+            <div className="absolute -top-4 -right-4 w-full h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-2xl opacity-20"></div>
+            <div className="absolute -bottom-4 -left-4 w-full h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-2xl opacity-20"></div>
+          </div>
           </div>
         </div>
       </section>
@@ -99,7 +94,7 @@ export function App() {
       {/* Features Section */}
       <section id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Our <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Academic Excellence</span>
             </h2>
@@ -320,21 +315,94 @@ export function App() {
           </div>
         </div>
       </section>
-
-      {/* Footer Component */}
-      <Footer 
-        schoolName="EduBot AI School"
-        schoolDescription="Empowering students with AI-driven education and comprehensive school management for Classes 4-10."
-        address="123 Education Lane, Tech City, TC 12345"
-        phone="+91 98765 43210"
-        email="info@edubotaischool.edu"
-        socialLinks={{
-          facebook: "https://facebook.com/edubotaischool",
-          twitter: "https://twitter.com/edubotaischool",
-          instagram: "https://instagram.com/edubotaischool"
-        }}
-      />
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <AuthProvider>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
+        {/* Global Header */}
+        <Header 
+          schoolName="EduBot AI School"
+          showLoginButton={true}
+        />
+
+        {/* Routes */}
+        <Routes>
+            {/* Public Routes */}
+            <Route 
+              path="/" 
+              element={
+                <PublicRoute>
+                  <HomePage />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/login" 
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/forgot-password" 
+              element={
+                <PublicRoute>
+                  <ForgotPassword />
+                </PublicRoute>
+              } 
+            />
+
+            {/* Protected Dashboard Routes */}
+            <Route 
+              path="/admin" 
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              } 
+            />
+            <Route 
+              path="/teacher" 
+              element={
+                <TeacherRoute>
+                  <TeacherDashboard />
+                </TeacherRoute>
+              } 
+            />
+            <Route 
+              path="/student" 
+              element={
+                <StudentRoute>
+                  <StudentDashboard />
+                </StudentRoute>
+              } 
+            />
+
+            {/* Utility Routes */}
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+
+          {/* Global Footer */}
+          <Footer 
+            schoolName="EduBot AI School"
+            schoolDescription="Empowering students with AI-driven education and comprehensive school management for Classes 4-10."
+            address="123 Education Lane, Tech City, TC 12345"
+            phone="+91 98765 43210"
+            email="info@edubotaischool.edu"
+            socialLinks={{
+              facebook: "https://facebook.com/edubotaischool",
+              twitter: "https://twitter.com/edubotaischool",
+              instagram: "https://instagram.com/edubotaischool"
+            }}
+          />
+        </div>
+      </AuthProvider>
   );
 }
 

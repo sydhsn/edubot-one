@@ -1,22 +1,41 @@
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
 export interface HeaderProps {
   schoolName?: string;
   logoUrl?: string;
   showLoginButton?: boolean;
-  onLoginClick?: () => void;
 }
 
 export function Header({ 
   schoolName = "EduBot AI School", 
   logoUrl,
-  showLoginButton = true,
-  onLoginClick
+  showLoginButton = true
 }: HeaderProps) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
+  const getDashboardLink = () => {
+    if (!user) return '/';
+    switch (user.role) {
+      case 'admin': return '/admin';
+      case 'teacher': return '/teacher';
+      case 'student': return '/student';
+      default: return '/';
+    }
+  };
+
   return (
     <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3">
             <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-2 rounded-xl">
               {logoUrl ? (
                 <img src={logoUrl} alt={schoolName} className="w-8 h-8" />
@@ -27,38 +46,62 @@ export function Header({
               )}
             </div>
             <span className="text-xl font-bold text-gray-900">{schoolName}</span>
-          </div>
+          </Link>
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <button className="text-gray-600 hover:text-emerald-600 transition-colors">
-              Home
-            </button>
-            <button className="text-gray-600 hover:text-emerald-600 transition-colors">
-              About
-            </button>
-            <button className="text-gray-600 hover:text-emerald-600 transition-colors">
-              Academics
-            </button>
-            <button className="text-gray-600 hover:text-emerald-600 transition-colors">
-              Admissions
-            </button>
-            <button className="text-gray-600 hover:text-emerald-600 transition-colors">
-              Contact
-            </button>
+            {user ? (
+              <>
+                <Link 
+                  to={getDashboardLink()}
+                  className="text-gray-600 hover:text-emerald-600 transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <span className="text-gray-600">
+                  Welcome, {user.full_name || user.email} ({user.role})
+                </span></>
+            ) : (
+              <>
+                <Link to="/" className="text-gray-600 hover:text-emerald-600 transition-colors">
+                  Home
+                </Link>
+                <button className="text-gray-600 hover:text-emerald-600 transition-colors">
+                  About
+                </button>
+                <button className="text-gray-600 hover:text-emerald-600 transition-colors">
+                  Academics
+                </button>
+                <button className="text-gray-600 hover:text-emerald-600 transition-colors">
+                  Admissions
+                </button>
+                <button className="text-gray-600 hover:text-emerald-600 transition-colors">
+                  Contact
+                </button>
+              </>
+            )}
           </div>
 
-          {/* Login Button */}
-          {showLoginButton && (
-            <div className="flex items-center space-x-4">
+          {/* Auth Button */}
+          <div className="flex items-center space-x-4">
+            {user ? (
               <button 
-                onClick={onLoginClick}
-                className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all transform hover:scale-105 shadow-sm"
+                onClick={handleLogout}
+                className="px-6 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg hover:from-red-700 hover:to-red-800 transition-all transform hover:scale-105 shadow-sm"
               >
-                Login
+                Logout
               </button>
-            </div>
-          )}
+            ) : (
+              showLoginButton && (
+                <Link 
+                  to="/login"
+                  className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all transform hover:scale-105 shadow-sm"
+                >
+                  Login
+                </Link>
+              )
+            )}
+          </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden">

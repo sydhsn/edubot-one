@@ -270,3 +270,66 @@ class AuthService:
         year = datetime.now().year
         count = len([u for u in self.users if u["role"] in ["teacher", "admin"]]) + 1
         return f"{prefix}{year}{count:04d}"
+    
+    async def setup_default_users(self) -> Dict[str, Any]:
+        """Setup default users for testing (admin, teacher, student)"""
+        created_users = []
+        
+        # Check if teacher already exists
+        teacher_exists = any(u["email"] == "teacher@school.com" for u in self.users)
+        if not teacher_exists:
+            teacher_doc = {
+                "_id": str(uuid.uuid4()),
+                "email": "teacher@school.com",
+                "full_name": "Default Teacher",
+                "mobile": "+1234567891",
+                "password_hash": AuthUtils.get_password_hash("teacher123"),
+                "subject": "Mathematics",
+                "role": "teacher",
+                "employee_id": "TCH20250001",
+                "created_at": datetime.utcnow(),
+                "is_active": True,
+                "reset_token": None,
+                "reset_token_expires": None
+            }
+            self.users.append(teacher_doc)
+            created_users.append("teacher@school.com")
+        
+        # Check if student already exists
+        student_exists = any(u["email"] == "student@school.com" for u in self.users)
+        if not student_exists:
+            student_doc = {
+                "_id": str(uuid.uuid4()),
+                "email": "student@school.com",
+                "full_name": "Default Student",
+                "mobile": "+1234567892",
+                "password_hash": AuthUtils.get_password_hash("student123"),
+                "class_name": "Grade 10",
+                "address": "123 School Street",
+                "role": "student",
+                "admission_number": "ADM20250001",
+                "created_at": datetime.utcnow(),
+                "is_active": True,
+                "reset_token": None,
+                "reset_token_expires": None
+            }
+            self.users.append(student_doc)
+            created_users.append("student@school.com")
+        
+        # Admin already exists from constructor
+        admin_exists = any(u["email"] == "admin@school.com" for u in self.users)
+        
+        return {
+            "message": "Default users setup complete!",
+            "created_users": created_users,
+            "existing_users": {
+                "admin": "admin@school.com" if admin_exists else None,
+                "teacher": "teacher@school.com" if teacher_exists else None,
+                "student": "student@school.com" if student_exists else None
+            },
+            "default_credentials": {
+                "admin": {"email": "admin@school.com", "password": "admin123"},
+                "teacher": {"email": "teacher@school.com", "password": "teacher123"},
+                "student": {"email": "student@school.com", "password": "student123"}
+            }
+        }
