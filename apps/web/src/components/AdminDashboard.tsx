@@ -3,17 +3,23 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useRole } from '../contexts/AuthContext';
-import AuthService, { RegisterStudentRequest, RegisterTeacherRequest } from '../services/authService';
+import AuthService, { RegisterTeacherRequest } from '../services/authService';
+import AdmissionsService, { DirectAdmissionRequest } from '../services/admissionsService';
 import { User } from '../services/api';
 
 // Form data interfaces
 interface StudentFormData {
+  student_name: string;
   email: string;
   password: string;
-  full_name: string;
-  student_id?: string;
-  grade?: string;
-  section?: string;
+  parent_name: string;
+  parent_email: string;
+  parent_phone: string;
+  class_name: string;
+  previous_school?: string;
+  address: string;
+  date_of_birth: string;
+  admission_number?: string;
 }
 
 interface TeacherFormData {
@@ -27,12 +33,17 @@ interface TeacherFormData {
 
 // Validation schemas
 const studentSchema: yup.ObjectSchema<StudentFormData> = yup.object({
+  student_name: yup.string().required('Student name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
   password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-  full_name: yup.string().required('Full name is required'),
-  student_id: yup.string().notRequired(),
-  grade: yup.string().notRequired(),
-  section: yup.string().notRequired(),
+  parent_name: yup.string().required('Parent name is required'),
+  parent_email: yup.string().email('Invalid parent email').required('Parent email is required'),
+  parent_phone: yup.string().required('Parent phone is required'),
+  class_name: yup.string().required('Class is required'),
+  previous_school: yup.string().notRequired(),
+  address: yup.string().required('Address is required'),
+  date_of_birth: yup.string().required('Date of birth is required'),
+  admission_number: yup.string().notRequired(),
 }).required();
 
 const teacherSchema: yup.ObjectSchema<TeacherFormData> = yup.object({
@@ -101,8 +112,8 @@ export const AdminDashboard: React.FC = () => {
       setError(null);
       setMessage(null);
       
-      await AuthService.registerStudent(data as RegisterStudentRequest);
-      setMessage('Student registered successfully!');
+      await AdmissionsService.registerStudent(data as DirectAdmissionRequest);
+      setMessage('Student admitted successfully!');
       studentForm.reset();
       await loadUsers();
     } catch (err) {
@@ -463,8 +474,8 @@ export const AdminDashboard: React.FC = () => {
                   <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <span role="img" aria-label="Student" className="text-3xl text-white">👨‍🎓</span>
                   </div>
-                  <h2 className="text-3xl font-bold text-gray-800 mb-2">Register New Student</h2>
-                  <p className="text-gray-600">Add a new student to the school management system</p>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-2">Direct Student Admission</h2>
+                  <p className="text-gray-600">Register student immediately when parents visit the school</p>
                 </div>
 
                 <div className="bg-white/70 backdrop-blur-lg rounded-3xl shadow-xl border border-white/20 overflow-hidden">

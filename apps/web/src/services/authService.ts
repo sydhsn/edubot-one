@@ -24,12 +24,17 @@ export interface LoginRequest {
 }
 
 export interface RegisterStudentRequest {
+  student_name: string;
   email: string;
   password: string;
-  full_name: string;
-  student_id?: string;
-  grade?: string;
-  section?: string;
+  parent_name: string;
+  parent_email: string;
+  parent_phone: string;
+  class_name: string;
+  previous_school?: string;
+  address: string;
+  date_of_birth: string;
+  admission_number?: string;
 }
 
 export interface RegisterTeacherRequest {
