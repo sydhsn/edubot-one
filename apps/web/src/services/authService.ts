@@ -77,7 +77,7 @@ export class AuthService {
    */
   static async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
-      const response = await api.post('/api/v1/auth/login', credentials);
+      const response = await api.post('/api/login', credentials);
       
       // Handle simple API response format
       if (response.data.user && response.data.token) {
@@ -150,7 +150,7 @@ export class AuthService {
   static async logout(): Promise<void> {
     try {
       // Call logout endpoint if available
-      await api.post('/api/v1/auth/logout');
+      await api.post('/api/logout');
     } catch {
       // Silent fail for logout endpoint
     } finally {
@@ -164,7 +164,7 @@ export class AuthService {
    */
   static async registerStudent(studentData: RegisterStudentRequest): Promise<User> {
     try {
-      const response = await api.post<User>('/api/v1/auth/register/student', studentData);
+      const response = await api.post<User>('/api/register/student', studentData);
       return response.data;
     } catch (error) {
       const apiError = error as ApiError;
@@ -177,7 +177,7 @@ export class AuthService {
    */
   static async registerTeacher(teacherData: RegisterTeacherRequest): Promise<User> {
     try {
-      const response = await api.post<User>('/api/v1/auth/register/teacher', teacherData);
+      const response = await api.post<User>('/api/register/teacher', teacherData);
       return response.data;
     } catch (error) {
       const apiError = error as ApiError;
@@ -190,7 +190,7 @@ export class AuthService {
    */
   static async getCurrentUser(): Promise<User> {
     try {
-      const response = await api.get<User>('/api/v1/auth/me');
+      const response = await api.get<User>('/api/me');
       return response.data;
     } catch (error) {
       const apiError = error as ApiError;
@@ -203,7 +203,7 @@ export class AuthService {
    */
   static async forgotPassword(email: string): Promise<{ message: string }> {
     try {
-      const response = await api.post<{ message: string }>('/api/v1/auth/forgot-password', { email });
+      const response = await api.post<{ message: string }>('/api/forgot-password', { email });
       return response.data;
     } catch (error) {
       const apiError = error as ApiError;
@@ -216,7 +216,7 @@ export class AuthService {
    */
   static async resetPassword(resetData: ResetPasswordRequest): Promise<{ message: string }> {
     try {
-      const response = await api.post<{ message: string }>('/api/v1/auth/reset-password', resetData);
+      const response = await api.post<{ message: string }>('/api/reset-password', resetData);
       return response.data;
     } catch (error) {
       const apiError = error as ApiError;
@@ -229,7 +229,7 @@ export class AuthService {
    */
   static async changePassword(passwordData: ChangePasswordRequest): Promise<{ message: string }> {
     try {
-      const response = await api.put<{ message: string }>('/api/v1/auth/change-password', passwordData);
+      const response = await api.put<{ message: string }>('/api/change-password', passwordData);
       return response.data;
     } catch (error) {
       const apiError = error as ApiError;
@@ -242,7 +242,7 @@ export class AuthService {
    */
   static async getAllUsers(): Promise<User[]> {
     try {
-      const response = await api.get<User[]>('/api/v1/auth/users');
+      const response = await api.get<User[]>('/api/users');
       return response.data;
     } catch (error) {
       const apiError = error as ApiError;
