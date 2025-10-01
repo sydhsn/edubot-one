@@ -237,3 +237,43 @@ async def refresh_token(current_user: dict = Depends(get_current_user)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Token refresh failed: {str(e)}"
         )
+
+@router.post("/register/teacher")
+async def register_teacher(
+    teacher_data: TeacherCreate,
+    admin_user: dict = Depends(get_admin_user)
+):
+    """Register a new teacher (Admin only)"""
+    try:
+        teacher = await auth_service.create_teacher(teacher_data, admin_user["sub"])
+        return {
+            "message": "Teacher registered successfully",
+            "teacher": teacher
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Teacher registration failed: {str(e)}"
+        )
+
+@router.post("/register/student")
+async def register_student(
+    student_data: StudentCreate,
+    admin_user: dict = Depends(get_admin_user)
+):
+    """Register a new student (Admin only)"""
+    try:
+        student = await auth_service.create_student(student_data)
+        return {
+            "message": "Student registered successfully",
+            "student": student
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Student registration failed: {str(e)}"
+        )

@@ -145,16 +145,15 @@ export class AuthService {
   }
 
   /**
-   * Logout user
+   * Logout user (client-side only - remove tokens)
    */
   static async logout(): Promise<void> {
     try {
-      // Call logout endpoint if available
-      await api.post('/api/auth/logout');
-    } catch {
-      // Silent fail for logout endpoint
-    } finally {
-      // Always clear tokens
+      // For JWT, logout is handled client-side by removing tokens
+      tokenStorage.clearAll();
+    } catch (err) {
+      console.error('Logout error:', err);
+      // Always clear tokens even if there's an error
       tokenStorage.clearAll();
     }
   }

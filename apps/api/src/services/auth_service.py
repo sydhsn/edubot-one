@@ -402,12 +402,12 @@ class AuthService:
     
     async def get_user_by_id(self, user_id: str) -> dict:
         """Get user by ID"""
-        user = next((u for u in self.users if u.get("id") == user_id), None)
+        user = next((u for u in self.users if u.get("_id") == user_id), None)
         return user
     
     async def change_password(self, user_id: str, old_password: str, new_password: str) -> bool:
         """Change user password"""
-        user = next((u for u in self.users if u.get("id") == user_id), None)
+        user = next((u for u in self.users if u.get("_id") == user_id), None)
         if not user:
             return False
         
