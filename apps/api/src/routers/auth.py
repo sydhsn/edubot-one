@@ -31,43 +31,6 @@ async def get_admin_user(current_user: dict = Depends(get_current_user)):
         )
     return current_user
 
-@router.post("/register/student", response_model=dict)
-async def register_student(student_data: StudentCreate):
-    """Student self-registration (admission)"""
-    try:
-        student = await auth_service.create_student(student_data)
-        return {
-            "message": "Student registration successful", 
-            "student": student
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Registration failed: {str(e)}"
-        )
-
-@router.post("/create/teacher", response_model=dict)
-async def create_teacher(
-    teacher_data: TeacherCreate, 
-    admin_user: dict = Depends(get_admin_user)
-):
-    """Create teacher account (admin only)"""
-    try:
-        teacher = await auth_service.create_teacher(teacher_data, admin_user["sub"])
-        return {
-            "message": "Teacher account created successfully", 
-            "teacher": teacher
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Teacher creation failed: {str(e)}"
-        )
-
 @router.post("/login", response_model=LoginResponse)
 async def login(login_data: LoginRequest):
     """User login"""
@@ -186,4 +149,91 @@ async def get_users_by_role(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get {role}s: {str(e)}"
+        )
+
+@router.get("/me")
+async def get_current_user_profile(current_user: dict = Depends(get_current_user)):
+    """Get current user profile"""
+    try:
+        user_profile = await auth_service.get_user_by_id(current_user["sub"])
+        if not user_profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        # Remove sensitive information
+        safe_profile = {key: value for key, value in user_profile.items() 
+                      if key not in ["password", "reset_token", "reset_token_expires"]}
+        return safe_profile
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get user profile: {str(e)}"
+        )
+
+@router.post("/change-password")
+async def change_password(
+    password_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Change user password"""
+    try:
+        old_password = password_data.get("old_password")
+        new_password = password_data.get("new_password")
+        
+        if not old_password or not new_password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Both old_password and new_password are required"
+            )
+        
+        success = await auth_service.change_password(
+            current_user["sub"], 
+            old_password, 
+            new_password
+        )
+        
+        if success:
+            return {"message": "Password changed successfully"}
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid old password"
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Password change failed: {str(e)}"
+        )
+
+@router.post("/refresh")
+async def refresh_token(current_user: dict = Depends(get_current_user)):
+    """Refresh JWT token"""
+    try:
+        # Generate new token with same user data
+        new_token = JWTHandler.create_access_token(data={
+            "sub": current_user["sub"],
+            "email": current_user["email"],
+            "role": current_user["role"],
+            "full_name": current_user.get("full_name", "")
+        })
+        
+        return {
+            "access_token": new_token,
+            "token_type": "bearer",
+            "user": {
+                "id": current_user["sub"],
+                "email": current_user["email"],
+                "role": current_user["role"],
+                "full_name": current_user.get("full_name", "")
+            }
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Token refresh failed: {str(e)}"
         )

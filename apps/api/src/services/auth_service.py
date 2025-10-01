@@ -8,9 +8,11 @@ import uuid
 import secrets
 from ..models.schemas import *
 from ..core.auth import AuthUtils, JWTHandler
+from .email_service import EmailService
 
 class AuthService:
     def __init__(self):
+        self.email_service = EmailService()
         # In-memory storage for development (replace with MongoDB when ready)
         self.users = [
             # Default admin user
@@ -185,8 +187,15 @@ class AuthService:
         user["reset_token"] = reset_token
         user["reset_token_expires"] = reset_expires
         
-        # TODO: Send email with reset token
-        print(f"Password reset token for {email}: {reset_token}")
+        # Send email with reset token
+        try:
+            await self.email_service.send_password_reset_email(
+                email, user["name"], reset_token
+            )
+            print(f"Password reset email sent successfully to {email}")
+        except Exception as e:
+            print(f"Failed to send password reset email to {email}: {str(e)}")
+            # Continue anyway - we still generated the token
         
         return True
     
@@ -390,3 +399,22 @@ class AuthService:
             sanitized_users.append(sanitized_user)
         
         return sanitized_users
+    
+    async def get_user_by_id(self, user_id: str) -> dict:
+        """Get user by ID"""
+        user = next((u for u in self.users if u.get("id") == user_id), None)
+        return user
+    
+    async def change_password(self, user_id: str, old_password: str, new_password: str) -> bool:
+        """Change user password"""
+        user = next((u for u in self.users if u.get("id") == user_id), None)
+        if not user:
+            return False
+        
+        # Verify old password
+        if not self.verify_password(old_password, user["password"]):
+            return False
+        
+        # Update password
+        user["password"] = self.hash_password(new_password)
+        return True

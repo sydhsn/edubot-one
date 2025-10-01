@@ -1,5 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from ..models.schemas import AIQuestionRequest, AIQuestionResponse
+from ..models.schemas import (
+    AIQuestionRequest, AIQuestionResponse, 
+    AIChatRequest, AIChatResponse, 
+    PosterRequest, PosterResponse
+)
 from ..services.ai_service import AIService
 
 router = APIRouter()
@@ -8,35 +12,37 @@ ai_service = AIService()
 @router.post("/generate-questions", response_model=AIQuestionResponse)
 async def generate_questions(request: AIQuestionRequest):
     try:
-        questions = ai_service.generate_questions(
+        questions = await ai_service.generate_questions(
             request.subject,
             request.topic,
             request.difficulty,
-            request.number_of_questions
+            request.question_type,
+            request.num_questions
         )
         return AIQuestionResponse(**questions)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
-@router.post("/generate-poster")
-async def generate_poster(event_data: dict):
+@router.post("/generate-poster", response_model=PosterResponse)
+async def generate_poster(request: PosterRequest):
     try:
-        poster = ai_service.generate_poster(
-            event_data.get("title"),
-            event_data.get("description"),
-            event_data.get("theme", "school")
+        poster = await ai_service.generate_poster(
+            request.title,
+            request.description,
+            request.theme,
+            request.size
         )
-        return {"poster_url": poster, "message": "Poster generated successfully"}
+        return PosterResponse(**poster)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/chatbot")
-async def chatbot_query(query: dict):
+@router.post("/chatbot", response_model=AIChatResponse)
+async def chatbot_query(request: AIChatRequest):
     try:
-        response = ai_service.chatbot_response(
-            query.get("message"),
-            query.get("context", "general")
+        response = await ai_service.chatbot_response(
+            request.message,
+            request.context
         )
-        return {"response": response}
+        return AIChatResponse(**response)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

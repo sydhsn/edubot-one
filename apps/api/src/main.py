@@ -2,12 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import available routers
-from .routers import admissions, auth
+from .routers import admissions, auth, ai, attendance, courses, timetables, assignments, reports
 from .core.config import settings
 
 app = FastAPI(
     title="School Management System API",
-    description="Simple school management with student admission and authentication",
+    description="Complete school management with role-based access control",
     version="1.0.0"
 )
 
@@ -22,8 +22,14 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.router, prefix="/api/v1", tags=["Authentication"])
-app.include_router(admissions.router, prefix="/api/v1/admissions", tags=["Admissions"])
+app.include_router(auth.router, prefix="/api", tags=["Authentication"])
+app.include_router(admissions.router, prefix="/api/admissions", tags=["Admissions"])
+app.include_router(ai.router, prefix="/api/ai", tags=["AI Features"])
+app.include_router(attendance.router, prefix="/api/attendance", tags=["Attendance"])
+app.include_router(courses.router, prefix="/api/courses", tags=["Courses"])
+app.include_router(timetables.router, prefix="/api/timetables", tags=["Timetables"])
+app.include_router(assignments.router, prefix="/api/assignments", tags=["Assignments"])
+app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
 
 @app.get("/")
 async def root():
@@ -31,26 +37,23 @@ async def root():
         "message": "School Management System API",
         "status": "running",
         "docs": "/docs",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "features": {
+            "authentication": "JWT-based with role-based access control",
+            "admissions": "Complete admission workflow",
+            "ai_features": "Gemini-powered content generation",
+            "attendance": "Comprehensive attendance tracking",
+            "courses": "Course and curriculum management",
+            "timetables": "Class scheduling system",
+            "assignments": "Assignment creation and submission",
+            "reports": "Student performance reports"
+        }
     }
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy", "timestamp": "2025-01-01T00:00:00Z"}
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-async def root():
-    return {"message": "Edubot API is running!"}
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
-
-if __name__ == "__main__":
-    import uvicorn
-    import os
-    
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
