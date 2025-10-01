@@ -1,5 +1,22 @@
 import { api, tokenStorage, LoginResponse, User } from './api';
 
+// Raw API response interface (what the API actually returns)
+interface RawLoginResponse {
+  access_token: string;
+  refresh_token?: string;
+  token_type: string;
+  user_role: string;
+  user_info: {
+    id: string;
+    email: string;
+    role: 'admin' | 'teacher' | 'student';
+    full_name?: string;
+    is_active?: boolean;
+    mobile?: string;
+    employee_id?: string;
+  };
+}
+
 // Auth API interfaces
 export interface LoginRequest {
   email: string;
@@ -55,15 +72,67 @@ export class AuthService {
    */
   static async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
-      const response = await api.post<LoginResponse>('/api/v1/auth/login', credentials);
+      const response = await api.post('/api/v1/auth/login', credentials);
       
-      // Store tokens
-      tokenStorage.setToken(response.data.access_token);
-      if (response.data.refresh_token) {
-        tokenStorage.setRefreshToken(response.data.refresh_token);
+      // Handle simple API response format
+      if (response.data.user && response.data.token) {
+        // Simple API format: { user: {...}, token: "..." }
+        const simpleResponse = response.data;
+        
+        // Store token
+        tokenStorage.setToken(simpleResponse.token);
+        
+        // Transform to expected format
+        const transformedResponse: LoginResponse = {
+          access_token: simpleResponse.token,
+          refresh_token: undefined,
+          token_type: 'Bearer',
+          user_role: simpleResponse.user.role,
+          user_info: {
+            id: simpleResponse.user.id,
+            email: simpleResponse.user.email,
+            role: simpleResponse.user.role,
+            full_name: simpleResponse.user.name || '',
+            is_active: true,
+          },
+          user: {
+            id: simpleResponse.user.id,
+            email: simpleResponse.user.email,
+            role: simpleResponse.user.role,
+            full_name: simpleResponse.user.name || '',
+            is_active: true,
+          }
+        };
+        
+        return transformedResponse;
+      } else {
+        // Original API format: { access_token: "...", user_info: {...} }
+        const originalResponse = response.data as RawLoginResponse;
+        
+        // Store tokens
+        tokenStorage.setToken(originalResponse.access_token);
+        if (originalResponse.refresh_token) {
+          tokenStorage.setRefreshToken(originalResponse.refresh_token);
+        }
+        
+        // Transform the response to match our expected format
+        const transformedResponse: LoginResponse = {
+          access_token: originalResponse.access_token,
+          refresh_token: originalResponse.refresh_token,
+          token_type: originalResponse.token_type,
+          user_role: originalResponse.user_role,
+          user_info: originalResponse.user_info,
+          user: {
+            id: originalResponse.user_info.id,
+            email: originalResponse.user_info.email,
+            role: originalResponse.user_info.role,
+            full_name: originalResponse.user_info.full_name || '',
+            is_active: originalResponse.user_info.is_active ?? true,
+          }
+        };
+        
+        return transformedResponse;
       }
-      
-      return response.data;
     } catch (error) {
       const apiError = error as ApiError;
       throw new Error(apiError.response?.data?.message || 'Login failed');
@@ -77,8 +146,8 @@ export class AuthService {
     try {
       // Call logout endpoint if available
       await api.post('/api/v1/auth/logout');
-    } catch (error) {
-      console.warn('Logout endpoint failed:', error);
+    } catch {
+      // Silent fail for logout endpoint
     } finally {
       // Always clear tokens
       tokenStorage.clearAll();
@@ -181,7 +250,7 @@ export class AuthService {
    */
   static async getUsersByRole(role: 'admin' | 'teacher' | 'student'): Promise<User[]> {
     try {
-      const response = await api.get<User[]>(`/auth/users?role=${role}`);
+      const response = await api.get<User[]>(`/api/v1/auth/users/by-role?role=${role}`);
       return response.data;
     } catch (error) {
       const apiError = error as ApiError;
@@ -222,14 +291,21 @@ export class AuthService {
     const token = tokenStorage.getToken();
     if (!token) return false;
     
-    // Check if token is expired
+    // For simple tokens (like dummy_token_for_X), just check if token exists
+    if (token.startsWith('dummy_token_for_')) {
+      return true;
+    }
+    
+    // Check if token is expired (for JWT tokens)
     try {
       const payload = token.split('.')[1];
       const decoded = JSON.parse(atob(payload));
       const currentTime = Date.now() / 1000;
       return decoded.exp > currentTime;
     } catch {
-      return false;
+      // If token parsing fails, but token exists, assume it's valid
+      // This handles non-JWT tokens
+      return true;
     }
   }
 

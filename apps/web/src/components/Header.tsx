@@ -5,19 +5,37 @@ export interface HeaderProps {
   schoolName?: string;
   logoUrl?: string;
   showLoginButton?: boolean;
+  onLoginClick?: () => void;
+  user?: { role: string; full_name?: string; email: string } | null;
+  onLogout?: () => void;
 }
 
 export function Header({ 
   schoolName = "EduBot AI School", 
   logoUrl,
-  showLoginButton = true
+  showLoginButton = true,
+  onLoginClick,
+  user: propUser,
+  onLogout: propOnLogout
 }: HeaderProps) {
-  const { user, logout } = useAuth();
+  const { user: contextUser, logout: contextLogout } = useAuth();
   const navigate = useNavigate();
+
+  // Use prop user/logout if provided, otherwise use context
+  const user = propUser || contextUser;
+  const logout = propOnLogout || contextLogout;
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
+  };
+
+  const handleLoginClick = () => {
+    if (onLoginClick) {
+      onLoginClick();
+    } else {
+      navigate('/login');
+    }
   };
 
   const getDashboardLink = () => {
@@ -93,12 +111,13 @@ export function Header({
               </button>
             ) : (
               showLoginButton && (
-                <Link 
-                  to="/login"
+                <button 
+                  type="button"
+                  onClick={handleLoginClick}
                   className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all transform hover:scale-105 shadow-sm"
                 >
                   Login
-                </Link>
+                </button>
               )
             )}
           </div>

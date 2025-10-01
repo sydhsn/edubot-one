@@ -1,163 +1,132 @@
 import React from 'react';
-import { useAuth } from '../contexts/AuthContext';
 
 export const StudentDashboard: React.FC = () => {
-  const { user, logout } = useAuth();
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Student Dashboard</h1>
-              <p className="text-sm text-gray-600">Welcome back, {user?.full_name || user?.email}</p>
-            </div>
-            <button
-              onClick={logout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-amber-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-6">Student Portal</h2>
+        <div className="bg-white/70 backdrop-blur-lg rounded-xl shadow-xl border border-emerald-100 p-8">
+          <h2 className="text-2xl font-bold mb-8 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            Student Portal
+          </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-blue-50 p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 rounded-xl border border-emerald-200 hover:shadow-lg transition-all duration-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
+                  <span role="img" aria-label="Books icon" className="text-3xl">📚</span>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900">My Courses</h3>
-                  <p className="text-sm text-gray-600">View enrolled courses</p>
+                  <h3 className="text-lg font-medium text-emerald-900">My Courses</h3>
+                  <p className="text-sm text-emerald-700">View enrolled courses</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-green-50 p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-xl border border-teal-200 hover:shadow-lg transition-all duration-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
+                  <span role="img" aria-label="Assignment icon" className="text-3xl">📝</span>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900">Assignments</h3>
-                  <p className="text-sm text-gray-600">View and submit assignments</p>
+                  <h3 className="text-lg font-medium text-teal-900">Assignments</h3>
+                  <p className="text-sm text-teal-700">View and submit assignments</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-purple-50 p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl border border-amber-200 hover:shadow-lg transition-all duration-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
+                  <span role="img" aria-label="Grade chart icon" className="text-3xl">📊</span>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900">Grades</h3>
-                  <p className="text-sm text-gray-600">View your academic progress</p>
+                  <h3 className="text-lg font-medium text-amber-900">Grades</h3>
+                  <p className="text-sm text-amber-700">View your academic progress</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-yellow-50 p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-100 p-6 rounded-xl border border-emerald-200 hover:shadow-lg transition-all duration-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                  <span role="img" aria-label="Calendar icon" className="text-3xl">📅</span>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900">Schedule</h3>
-                  <p className="text-sm text-gray-600">View class timetable</p>
+                  <h3 className="text-lg font-medium text-emerald-900">Schedule</h3>
+                  <p className="text-sm text-emerald-700">View class timetable</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-indigo-50 p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-teal-50 to-amber-100 p-6 rounded-xl border border-teal-200 hover:shadow-lg transition-all duration-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <span role="img" aria-label="Clock icon" className="text-3xl">🕐</span>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900">Attendance</h3>
-                  <p className="text-sm text-gray-600">Check attendance record</p>
+                  <h3 className="text-lg font-medium text-teal-900">Attendance</h3>
+                  <p className="text-sm text-teal-700">Check attendance record</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-pink-50 p-6 rounded-lg">
+            <div className="bg-gradient-to-br from-amber-50 to-emerald-100 p-6 rounded-xl border border-amber-200 hover:shadow-lg transition-all duration-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-8 w-8 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
+                  <span role="img" aria-label="Message icon" className="text-3xl">💬</span>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900">Messages</h3>
-                  <p className="text-sm text-gray-600">School announcements</p>
+                  <h3 className="text-lg font-medium text-amber-900">Messages</h3>
+                  <p className="text-sm text-amber-700">School announcements</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="mt-8">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
+            <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Recent Activity</h3>
+            <div className="bg-gradient-to-br from-emerald-50/50 to-teal-50/50 backdrop-blur-sm rounded-xl p-6 border border-emerald-100">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-3 border-b border-emerald-200">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Math Assignment Due</p>
-                    <p className="text-xs text-gray-600">Due: Tomorrow, 11:59 PM</p>
+                    <p className="text-sm font-medium text-emerald-900">Math Assignment Due</p>
+                    <p className="text-xs text-emerald-700">Due: Tomorrow, 11:59 PM</p>
                   </div>
-                  <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Pending</span>
+                  <span className="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded-full border border-amber-200">Pending</span>
                 </div>
                 
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                <div className="flex items-center justify-between py-3 border-b border-emerald-200">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Science Quiz Results</p>
-                    <p className="text-xs text-gray-600">Score: 85/100</p>
+                    <p className="text-sm font-medium text-emerald-900">Science Quiz Results</p>
+                    <p className="text-xs text-emerald-700">Score: 85/100</p>
                   </div>
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Completed</span>
+                  <span className="bg-teal-100 text-teal-800 text-xs px-3 py-1 rounded-full border border-teal-200">Completed</span>
                 </div>
                 
-                <div className="flex items-center justify-between py-2">
+                <div className="flex items-center justify-between py-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">History Class</p>
-                    <p className="text-xs text-gray-600">Next: Today, 2:00 PM</p>
+                    <p className="text-sm font-medium text-emerald-900">History Class</p>
+                    <p className="text-xs text-emerald-700">Next: Today, 2:00 PM</p>
                   </div>
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Upcoming</span>
+                  <span className="bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full border border-emerald-200">Upcoming</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Quick Actions</h3>
-            <div className="flex flex-wrap gap-3">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm">
+          <div className="mt-8 p-6 bg-gradient-to-br from-teal-50/50 to-amber-50/50 backdrop-blur-sm rounded-xl border border-teal-100">
+            <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-teal-600 to-amber-600 bg-clip-text text-transparent">Quick Actions</h3>
+            <div className="flex flex-wrap gap-4">
+              <button className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-6 py-3 rounded-lg hover:from-emerald-600 hover:to-teal-700 text-sm font-medium transition-all duration-200 shadow-lg">
                 Submit Assignment
               </button>
-              <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-sm">
+              <button className="bg-gradient-to-r from-teal-500 to-emerald-600 text-white px-6 py-3 rounded-lg hover:from-teal-600 hover:to-emerald-700 text-sm font-medium transition-all duration-200 shadow-lg">
                 Check Grades
               </button>
-              <button className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 text-sm">
+              <button className="bg-gradient-to-r from-amber-500 to-emerald-600 text-white px-6 py-3 rounded-lg hover:from-amber-600 hover:to-emerald-700 text-sm font-medium transition-all duration-200 shadow-lg">
                 View Schedule
               </button>
-              <button className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 text-sm">
+              <button className="bg-gradient-to-r from-teal-500 to-amber-600 text-white px-6 py-3 rounded-lg hover:from-teal-600 hover:to-amber-700 text-sm font-medium transition-all duration-200 shadow-lg">
                 Contact Teacher
               </button>
             </div>

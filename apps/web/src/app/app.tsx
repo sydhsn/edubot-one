@@ -1,11 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from '../contexts/AuthContext';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
 
 // Public components
 import { Header, Footer } from '../components';
 
 // Authentication components
-import Login from '../components/Login';
 import ForgotPassword from '../components/ForgotPassword';
 import Unauthorized from '../components/Unauthorized';
 
@@ -16,6 +16,29 @@ import StudentDashboard from '../components/StudentDashboard';
 
 // Protected Route components
 import { AdminRoute, TeacherRoute, StudentRoute, PublicRoute } from '../components/ProtectedRoute';
+import LoginModal from '../components/LoginModal';
+
+// Header with Login Button
+function HeaderWithLogin() {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { user, logout } = useAuth();
+
+  return (
+    <>
+      <Header 
+        schoolName="EduBot AI School"
+        showLoginButton={!user}
+        onLoginClick={() => setIsLoginModalOpen(true)}
+        user={user}
+        onLogout={logout}
+      />
+      <LoginModal
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
+    </>
+  );
+}
 
 // Home page component
 function HomePage() {
@@ -323,11 +346,8 @@ export function App() {
   return (
     <AuthProvider>
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
-        {/* Global Header */}
-        <Header 
-          schoolName="EduBot AI School"
-          showLoginButton={true}
-        />
+        {/* Global Header with Login Modal */}
+        <HeaderWithLogin />
 
         {/* Routes */}
         <Routes>
@@ -337,14 +357,6 @@ export function App() {
               element={
                 <PublicRoute>
                   <HomePage />
-                </PublicRoute>
-              } 
-            />
-            <Route 
-              path="/login" 
-              element={
-                <PublicRoute>
-                  <Login />
                 </PublicRoute>
               } 
             />

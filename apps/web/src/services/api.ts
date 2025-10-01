@@ -27,14 +27,18 @@ const decodeToken = (token: string) => {
     const payload = token.split('.')[1];
     const decoded = JSON.parse(atob(payload));
     return decoded;
-  } catch (error) {
-    console.error('Error decoding token:', error);
+  } catch {
     return null;
   }
 };
 
 // Check if token is expired
 const isTokenExpired = (token: string): boolean => {
+  // For simple tokens (like dummy_token_for_X), never expire
+  if (token.startsWith('dummy_token_for_')) {
+    return false;
+  }
+  
   const decoded = decodeToken(token);
   if (!decoded || !decoded.exp) return true;
   
@@ -63,8 +67,8 @@ const createAxiosInstance = (): AxiosInstance => {
         // Token is expired, clear it
         tokenStorage.clearAll();
         // Redirect to login if not already on login page
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
+        if (window.location.pathname !== '/') {
+          window.location.href = '/';
         }
       }
       
@@ -142,6 +146,16 @@ export interface LoginResponse {
   access_token: string;
   refresh_token?: string;
   token_type: string;
+  user_role: string;
+  user_info: {
+    id: string;
+    email: string;
+    role: 'admin' | 'teacher' | 'student';
+    full_name?: string;
+    is_active?: boolean;
+    mobile?: string;
+    employee_id?: string;
+  };
   user: {
     id: string;
     email: string;

@@ -151,3 +151,39 @@ async def setup_default_users():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Setup failed: {str(e)}"
         )
+
+@router.get("/users")
+async def get_all_users(admin_user: dict = Depends(get_admin_user)):
+    """Get all users (admin only)"""
+    try:
+        users = await auth_service.get_all_users()
+        return users
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get users: {str(e)}"
+        )
+
+@router.get("/users/by-role")
+async def get_users_by_role(
+    role: str,
+    admin_user: dict = Depends(get_admin_user)
+):
+    """Get users by role (admin only)"""
+    try:
+        if role not in ["admin", "teacher", "student"]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid role. Must be one of: admin, teacher, student"
+            )
+        users = await auth_service.get_users_by_role(role)
+        return users
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get {role}s: {str(e)}"
+        )

@@ -146,7 +146,6 @@ export const getColor = (path: string): string => {
   for (const key of keys) {
     current = current[key] as Record<string, unknown>;
     if (current === undefined) {
-      console.warn(`Color path "${path}" not found`);
       return colors.neutral.gray[500];
     }
   }

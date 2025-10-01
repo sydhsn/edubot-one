@@ -36,8 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const currentUser = await AuthService.getCurrentUser();
           setUser(currentUser);
         }
-      } catch (error) {
-        console.error('Failed to initialize auth:', error);
+      } catch {
         // If token is invalid, clear it
         await AuthService.logout();
       } finally {
@@ -67,8 +66,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       await AuthService.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
+    } catch {
+      // Silent fail for logout
     } finally {
       setUser(null);
       setIsLoading(false);
@@ -84,8 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         setUser(null);
       }
-    } catch (error) {
-      console.error('Failed to refresh user:', error);
+    } catch {
       setUser(null);
       await AuthService.logout();
     }

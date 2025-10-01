@@ -333,3 +333,60 @@ class AuthService:
                 "student": {"email": "student@school.com", "password": "student123"}
             }
         }
+
+    async def get_all_users(self) -> list:
+        """Get all users (admin only)"""
+        # Return sanitized user data (without password hashes)
+        sanitized_users = []
+        for user in self.users:
+            sanitized_user = {
+                "id": user["_id"],
+                "email": user["email"],
+                "full_name": user["full_name"],
+                "role": user["role"],
+                "is_active": user["is_active"],
+                "created_at": user["created_at"].isoformat() if isinstance(user["created_at"], datetime) else user["created_at"]
+            }
+            # Add role-specific fields
+            if user["role"] == "teacher":
+                sanitized_user["employee_id"] = user.get("employee_id")
+                sanitized_user["subject"] = user.get("subject")
+            elif user["role"] == "student":
+                sanitized_user["admission_number"] = user.get("admission_number")
+                sanitized_user["class_name"] = user.get("class_name")
+            elif user["role"] == "admin":
+                sanitized_user["employee_id"] = user.get("employee_id")
+            
+            sanitized_users.append(sanitized_user)
+        
+        return sanitized_users
+
+    async def get_users_by_role(self, role: str) -> list:
+        """Get users by role (admin only)"""
+        # Filter users by role
+        role_users = [user for user in self.users if user["role"] == role]
+        
+        # Return sanitized user data
+        sanitized_users = []
+        for user in role_users:
+            sanitized_user = {
+                "id": user["_id"],
+                "email": user["email"],
+                "full_name": user["full_name"],
+                "role": user["role"],
+                "is_active": user["is_active"],
+                "created_at": user["created_at"].isoformat() if isinstance(user["created_at"], datetime) else user["created_at"]
+            }
+            # Add role-specific fields
+            if role == "teacher":
+                sanitized_user["employee_id"] = user.get("employee_id")
+                sanitized_user["subject"] = user.get("subject")
+            elif role == "student":
+                sanitized_user["admission_number"] = user.get("admission_number")
+                sanitized_user["class_name"] = user.get("class_name")
+            elif role == "admin":
+                sanitized_user["employee_id"] = user.get("employee_id")
+            
+            sanitized_users.append(sanitized_user)
+        
+        return sanitized_users
