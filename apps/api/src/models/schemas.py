@@ -22,7 +22,7 @@ class UserBase(BaseModel):
 class StudentCreate(BaseModel):
     email: EmailStr
     full_name: str
-    mobile: str
+    mobile: Optional[str] = None  # Make mobile optional
     password: str
     class_name: str  # e.g., "10th Grade", "12th Science"
     address: Optional[str] = None

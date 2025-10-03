@@ -1,31 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useRole } from '../contexts/AuthContext';
-import AuthService, { RegisterTeacherRequest } from '../services/authService';
+import AuthService from '../services/authService';
 import AdmissionsService, { DirectAdmissionRequest } from '../services/admissionsService';
-import { User } from '../services/api';
+import { User, api } from '../services/api';
 
 // Form data interfaces
 interface StudentFormData {
-  student_name: string;
+  full_name: string;  // Changed from student_name to match form
   email: string;
   password: string;
-  parent_name: string;
-  parent_email: string;
-  parent_phone: string;
-  class_name: string;
-  previous_school?: string;
-  address: string;
-  date_of_birth: string;
-  admission_number?: string;
+  student_id?: string;  // Added to match form
+  grade?: string;  // Added to match form
+  section?: string;  // Added to match form
 }
 
 interface TeacherFormData {
   email: string;
   password: string;
   full_name: string;
+  mobile: string;
   employee_id?: string;
   department?: string;
   subject?: string;
@@ -33,23 +29,19 @@ interface TeacherFormData {
 
 // Validation schemas
 const studentSchema: yup.ObjectSchema<StudentFormData> = yup.object({
-  student_name: yup.string().required('Student name is required'),
+  full_name: yup.string().required('Full name is required'),  // Changed from student_name
   email: yup.string().email('Invalid email').required('Email is required'),
   password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-  parent_name: yup.string().required('Parent name is required'),
-  parent_email: yup.string().email('Invalid parent email').required('Parent email is required'),
-  parent_phone: yup.string().required('Parent phone is required'),
-  class_name: yup.string().required('Class is required'),
-  previous_school: yup.string().notRequired(),
-  address: yup.string().required('Address is required'),
-  date_of_birth: yup.string().required('Date of birth is required'),
-  admission_number: yup.string().notRequired(),
+  student_id: yup.string().notRequired(),  // Added
+  grade: yup.string().notRequired(),  // Added
+  section: yup.string().notRequired(),  // Added
 }).required();
 
 const teacherSchema: yup.ObjectSchema<TeacherFormData> = yup.object({
   email: yup.string().email('Invalid email').required('Email is required'),
   password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
   full_name: yup.string().required('Full name is required'),
+  mobile: yup.string().required('Mobile number is required'),
   employee_id: yup.string().notRequired(),
   department: yup.string().notRequired(),
   subject: yup.string().notRequired(),
@@ -69,15 +61,30 @@ export const AdminDashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Student form
-  const studentForm = useForm<StudentFormData>({
-    // @ts-expect-error - Complex type inference issue between Yup and React Hook Form
+  const studentForm = useForm({
     resolver: yupResolver(studentSchema),
+    defaultValues: {
+      full_name: '',
+      email: '',
+      password: '',
+      student_id: '',
+      grade: '',
+      section: '',
+    }
   });
 
   // Teacher form
-  const teacherForm = useForm<TeacherFormData>({
-    // @ts-expect-error - Complex type inference issue between Yup and React Hook Form
+  const teacherForm = useForm({
     resolver: yupResolver(teacherSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      full_name: '',
+      mobile: '',
+      employee_id: '',
+      department: '',
+      subject: '',
+    }
   });
 
   // Load users data
@@ -106,13 +113,28 @@ export const AdminDashboard: React.FC = () => {
   };
 
   // Register student
-  const onRegisterStudent: SubmitHandler<StudentFormData> = async (data) => {
+  const onRegisterStudent = async (data: Record<string, string>) => {
     try {
       setIsLoading(true);
       setError(null);
       setMessage(null);
       
-      await AdmissionsService.registerStudent(data as DirectAdmissionRequest);
+      // Transform form data to match API expectations
+      const studentData = {
+        student_name: data.full_name,
+        email: data.email,
+        password: data.password,
+        parent_name: data.full_name, // Use student name as parent name for now
+        parent_email: data.email, // Use student email for now
+        parent_phone: '', // Default empty
+        class_name: data.grade ? `Grade ${data.grade}` : '',
+        previous_school: '',
+        address: '',
+        date_of_birth: '',
+        admission_number: data.student_id || `STUDENT_${Date.now()}`,
+      };
+      
+      await AdmissionsService.registerStudent(studentData as DirectAdmissionRequest);
       setMessage('Student admitted successfully!');
       studentForm.reset();
       await loadUsers();
@@ -124,13 +146,23 @@ export const AdminDashboard: React.FC = () => {
   };
 
   // Register teacher
-  const onRegisterTeacher: SubmitHandler<TeacherFormData> = async (data) => {
+  const onRegisterTeacher = async (data: Record<string, string>) => {
     try {
       setIsLoading(true);
       setError(null);
       setMessage(null);
       
-      await AuthService.registerTeacher(data as RegisterTeacherRequest);
+      // Transform form data to match TeacherCreate API expectations
+      const teacherData = {
+        email: data.email,
+        full_name: data.full_name,
+        mobile: data.mobile,
+        password: data.password,
+        subject: data.subject || data.department || 'General', // Use subject first, fallback to department
+      };
+      
+      // Use admissions API endpoint for teacher creation
+      await api.post('/api/admissions/create-teacher', teacherData);
       setMessage('Teacher registered successfully!');
       teacherForm.reset();
       await loadUsers();
@@ -768,6 +800,29 @@ export const AdminDashboard: React.FC = () => {
                             <p className="mt-2 text-sm text-red-600 flex items-center">
                               <span role="img" aria-label="Error" className="mr-1">⚠️</span>
                               {teacherForm.formState.errors.password.message}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Mobile Number <span className="text-red-500">*</span>
+                          </label>
+                          <div className="relative">
+                            <input
+                              {...teacherForm.register('mobile')}
+                              type="tel"
+                              placeholder="Enter mobile number"
+                              className="w-full px-4 py-4 bg-white/70 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 pl-12"
+                            />
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                              <span role="img" aria-label="Phone" className="text-gray-400">📱</span>
+                            </div>
+                          </div>
+                          {teacherForm.formState.errors.mobile && (
+                            <p className="mt-2 text-sm text-red-600 flex items-center">
+                              <span role="img" aria-label="Error" className="mr-1">⚠️</span>
+                              {teacherForm.formState.errors.mobile.message}
                             </p>
                           )}
                         </div>

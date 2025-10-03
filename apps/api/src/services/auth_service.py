@@ -9,14 +9,21 @@ import secrets
 from ..models.schemas import *
 from ..core.auth import AuthUtils, JWTHandler
 from .email_service import EmailService
+from ..database import get_database
 
 class AuthService:
     def __init__(self):
         self.email_service = EmailService()
-        # In-memory storage for development (replace with MongoDB when ready)
-        self.users = [
-            # Default admin user
-            {
+        
+    async def _ensure_default_admin(self):
+        """Ensure default admin exists in database"""
+        db = get_database()
+        
+        # Check if admin already exists
+        admin_exists = await db.users.find_one({"email": "admin@school.com"})
+        if not admin_exists:
+            # Create default admin
+            default_admin = {
                 "_id": "admin-001",
                 "email": "admin@school.com",
                 "full_name": "System Administrator",
@@ -29,12 +36,16 @@ class AuthService:
                 "reset_token": None,
                 "reset_token_expires": None
             }
-        ]
-    
+            await db.users.insert_one(default_admin)
+            print("Default admin user created")
+        
     async def create_student(self, student_data: StudentCreate) -> Dict[str, Any]:
         """Register new student (admission)"""
+        db = get_database()
+        
         # Check if email already exists
-        if any(u["email"] == student_data.email for u in self.users):
+        existing_user = await db.users.find_one({"email": student_data.email})
+        if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered"
@@ -60,8 +71,8 @@ class AuthService:
             "reset_token_expires": None
         }
         
-        # Add to in-memory storage
-        self.users.append(student_doc)
+        # Save to MongoDB
+        await db.users.insert_one(student_doc)
         
         # Return student data (without password)
         result = student_doc.copy()
@@ -71,8 +82,10 @@ class AuthService:
     
     async def create_teacher(self, teacher_data: TeacherCreate, admin_id: str) -> Dict[str, Any]:
         """Create teacher (admin only)"""
+        db = get_database()
+        
         # Verify admin
-        admin = next((u for u in self.users if u["_id"] == admin_id and u["role"] == "admin"), None)
+        admin = await db.users.find_one({"_id": admin_id, "role": "admin"})
         if not admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -80,7 +93,8 @@ class AuthService:
             )
         
         # Check if email already exists
-        if any(u["email"] == teacher_data.email for u in self.users):
+        existing_user = await db.users.find_one({"email": teacher_data.email})
+        if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered"
@@ -105,8 +119,8 @@ class AuthService:
             "reset_token_expires": None
         }
         
-        # Add to in-memory storage
-        self.users.append(teacher_doc)
+        # Save to MongoDB
+        await db.users.insert_one(teacher_doc)
         
         # Return teacher data (without password)
         result = teacher_doc.copy()
@@ -116,8 +130,13 @@ class AuthService:
     
     async def login(self, login_data: LoginRequest) -> LoginResponse:
         """Login user"""
+        db = get_database()
+        
+        # Ensure default admin exists
+        await self._ensure_default_admin()
+        
         # Find user by email
-        user = next((u for u in self.users if u["email"] == login_data.email), None)
+        user = await db.users.find_one({"email": login_data.email})
         if not user or not AuthUtils.verify_password(login_data.password, user["password_hash"]):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -130,8 +149,11 @@ class AuthService:
                 detail="Account is deactivated"
             )
         
-        # Update last login
-        user["last_login"] = datetime.utcnow()
+        # Update last login in database
+        await db.users.update_one(
+            {"_id": user["_id"]}, 
+            {"$set": {"last_login": datetime.utcnow()}}
+        )
         
         # Create JWT token
         token_data = {
@@ -175,7 +197,9 @@ class AuthService:
     
     async def forgot_password(self, email: str) -> bool:
         """Initiate password reset"""
-        user = next((u for u in self.users if u["email"] == email), None)
+        db = get_database()
+        
+        user = await db.users.find_one({"email": email})
         if not user:
             return True  # Don't reveal if email exists
         
@@ -183,9 +207,14 @@ class AuthService:
         reset_token = secrets.token_urlsafe(32)
         reset_expires = datetime.utcnow() + timedelta(hours=1)
         
-        # Update user with reset token
-        user["reset_token"] = reset_token
-        user["reset_token_expires"] = reset_expires
+        # Update user with reset token in database
+        await db.users.update_one(
+            {"_id": user["_id"]},
+            {"$set": {
+                "reset_token": reset_token,
+                "reset_token_expires": reset_expires
+            }}
+        )
         
         # Send email with reset token
         try:
@@ -221,7 +250,12 @@ class AuthService:
     
     async def get_dashboard_data(self, user_id: str) -> Dict[str, Any]:
         """Get dashboard data for user"""
-        user = next((u for u in self.users if u["_id"] == user_id), None)
+        db = get_database()
+        
+        # Ensure default admin exists
+        await self._ensure_default_admin()
+        
+        user = await db.users.find_one({"_id": user_id})
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -241,14 +275,14 @@ class AuthService:
         stats = {}
         if user["role"] == "admin":
             stats = {
-                "total_students": len([u for u in self.users if u["role"] == "student"]),
-                "total_teachers": len([u for u in self.users if u["role"] == "teacher"]),
-                "total_admins": len([u for u in self.users if u["role"] == "admin"])
+                "total_students": await db.users.count_documents({"role": "student"}),
+                "total_teachers": await db.users.count_documents({"role": "teacher"}),
+                "total_admins": await db.users.count_documents({"role": "admin"})
             }
             user_info["employee_id"] = user.get("employee_id")
         elif user["role"] == "teacher":
             stats = {
-                "students_count": len([u for u in self.users if u["role"] == "student"]),
+                "students_count": await db.users.count_documents({"role": "student"}),
                 "subject": user.get("subject")
             }
             user_info.update({
@@ -270,14 +304,18 @@ class AuthService:
     
     async def _generate_admission_number(self) -> str:
         """Generate unique admission number"""
+        db = get_database()
+        
         year = datetime.now().year
-        count = len([u for u in self.users if u["role"] == "student"]) + 1
+        count = await db.users.count_documents({"role": "student"}) + 1
         return f"ADM{year}{count:04d}"
     
     async def _generate_employee_id(self, prefix: str) -> str:
         """Generate unique employee ID"""
+        db = get_database()
+        
         year = datetime.now().year
-        count = len([u for u in self.users if u["role"] in ["teacher", "admin"]]) + 1
+        count = await db.users.count_documents({"role": {"$in": ["teacher", "admin"]}}) + 1
         return f"{prefix}{year}{count:04d}"
     
     async def setup_default_users(self) -> Dict[str, Any]:
@@ -345,9 +383,17 @@ class AuthService:
 
     async def get_all_users(self) -> list:
         """Get all users (admin only)"""
+        db = get_database()
+        
+        # Ensure default admin exists
+        await self._ensure_default_admin()
+        
+        # Get all users from MongoDB
+        users = await db.users.find({}).to_list(length=None)
+        
         # Return sanitized user data (without password hashes)
         sanitized_users = []
-        for user in self.users:
+        for user in users:
             sanitized_user = {
                 "id": user["_id"],
                 "email": user["email"],
@@ -372,8 +418,13 @@ class AuthService:
 
     async def get_users_by_role(self, role: str) -> list:
         """Get users by role (admin only)"""
-        # Filter users by role
-        role_users = [user for user in self.users if user["role"] == role]
+        db = get_database()
+        
+        # Ensure default admin exists
+        await self._ensure_default_admin()
+        
+        # Filter users by role from MongoDB
+        role_users = await db.users.find({"role": role}).to_list(length=None)
         
         # Return sanitized user data
         sanitized_users = []
@@ -402,7 +453,12 @@ class AuthService:
     
     async def get_user_by_id(self, user_id: str) -> dict:
         """Get user by ID"""
-        user = next((u for u in self.users if u.get("_id") == user_id), None)
+        db = get_database()
+        
+        # Ensure default admin exists
+        await self._ensure_default_admin()
+        
+        user = await db.users.find_one({"_id": user_id})
         return user
     
     async def change_password(self, user_id: str, old_password: str, new_password: str) -> bool:

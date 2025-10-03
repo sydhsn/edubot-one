@@ -1,14 +1,34 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+import logging
 
 # Import available routers
 from .routers import admissions, auth, ai, attendance, courses, timetables, assignments, reports
 from .core.config import settings
+from .database import connect_to_mongo, close_mongo_connection
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("🚀 Starting School Management System API...")
+    await connect_to_mongo()
+    logger.info("✅ API startup complete")
+    yield
+    # Shutdown
+    logger.info("🛑 Shutting down API...")
+    await close_mongo_connection()
+    logger.info("✅ API shutdown complete")
 
 app = FastAPI(
     title="School Management System API",
     description="Complete school management with role-based access control",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Configure CORS

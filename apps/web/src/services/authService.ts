@@ -41,6 +41,7 @@ export interface RegisterTeacherRequest {
   email: string;
   password: string;
   full_name: string;
+  mobile: string;
   employee_id?: string;
   department?: string;
   subject?: string;

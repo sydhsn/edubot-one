@@ -48,7 +48,7 @@ class AdmissionsService {
    */
   async registerStudent(data: DirectAdmissionRequest): Promise<AdmissionResponse> {
     try {
-      const response = await api.post<AdmissionResponse>('/admissions/register-student', data);
+      const response = await api.post<AdmissionResponse>('/api/admissions/register-student', data);
       return response.data;
     } catch (error: unknown) {
       console.error('Student registration failed:', error);
