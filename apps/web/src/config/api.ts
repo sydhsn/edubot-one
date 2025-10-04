@@ -30,37 +30,37 @@ export const API_ENDPOINTS = {
   
   // Authentication endpoints
   AUTH: {
-    LOGIN: '/api/v1/auth/login',
-    LOGOUT: '/api/v1/auth/logout',
-    REGISTER: '/api/v1/auth/register',
-    REFRESH: '/api/v1/auth/refresh',
-    ME: '/api/v1/auth/me',
+    LOGIN: '/api/auth/login',
+    LOGOUT: '/api/auth/logout',
+    REGISTER: '/api/auth/register',
+    REFRESH: '/api/auth/refresh',
+    ME: '/api/auth/me',
   },
   
   // Admissions endpoints
   ADMISSIONS: {
-    BASE: '/api/v1/admissions',
-    LIST: '/api/v1/admissions',
-    CREATE: '/api/v1/admissions',
-    GET: (id: string) => `/api/v1/admissions/${id}`,
-    UPDATE: (id: string) => `/api/v1/admissions/${id}`,
-    DELETE: (id: string) => `/api/v1/admissions/${id}`,
+    BASE: '/api/admissions',
+    LIST: '/api/admissions',
+    CREATE: '/api/admissions',
+    GET: (id: string) => `/api/admissions/${id}`,
+    UPDATE: (id: string) => `/api/admissions/${id}`,
+    DELETE: (id: string) => `/api/admissions/${id}`,
   },
   
   // AI services endpoints
   AI: {
-    BASE: '/api/v1/ai',
-    CHAT: '/api/v1/ai/chat',
-    ANALYZE: '/api/v1/ai/analyze',
+    BASE: '/api/ai',
+    CHAT: '/api/ai/chat',
+    ANALYZE: '/api/ai/analyze',
   },
   
   // Attendance endpoints
   ATTENDANCE: {
-    BASE: '/api/v1/attendance',
-    LIST: '/api/v1/attendance',
-    CREATE: '/api/v1/attendance',
-    GET: (id: string) => `/api/v1/attendance/${id}`,
-    UPDATE: (id: string) => `/api/v1/attendance/${id}`,
+    BASE: '/api/attendance',
+    LIST: '/api/attendance',
+    CREATE: '/api/attendance',
+    GET: (id: string) => `/api/attendance/${id}`,
+    UPDATE: (id: string) => `/api/attendance/${id}`,
   },
 } as const;
 

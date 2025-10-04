@@ -2,7 +2,6 @@
 import { API_BASE_URL, API_ENDPOINTS, REQUEST_TIMEOUT } from '../config/api';
 import { AuthService } from './auth';
 import type {
-  ApiResponse,
   ErrorResponse,
   PaginationParams,
   LoginCredentials,
@@ -16,9 +15,7 @@ import type {
   Attendance,
   AttendanceListResponse,
   AttendanceQueryParams,
-  ChatMessage,
   ChatResponse,
-  AnalysisRequest,
   AnalysisResponse,
   HealthResponse,
 } from '../types/api';
